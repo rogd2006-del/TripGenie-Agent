@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: tripgenie-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=tripgenie_db
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tripgenie-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+      - MONGO_DB_NAME=tripgenie_db
+      - JWT_SECRET=tripgenie_super_secret_jwt_key_2026
+      - DEFAULT_LLM_PROVIDER=fallback
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo_data:

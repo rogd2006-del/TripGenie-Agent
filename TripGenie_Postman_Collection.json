@@ -1,0 +1,186 @@
+{
+	"info": {
+		"_postman_id": "c1f728a0-9a21-4f9e-b921-tripgenie2026",
+		"name": "TripGenie Autonomous Travel Planner API",
+		"description": "Postman Collection for TripGenie Backend FastAPI Server with Authentication, Trip History, Agent Planner Execution, and PDF Download.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"secret123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"jane@example.com\",\n  \"password\": \"secret123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "profile"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Planner & Multi-Agent",
+			"item": [
+				{
+					"name": "Start Agent Planner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"prompt\": \"I want a 4-day trip to Goa under ₹20,000 with beaches, nightlife, vegetarian food and adventure sports.\",\n  \"destination\": \"Goa, India\",\n  \"budget\": 20000,\n  \"duration_days\": 4,\n  \"travelers\": 2,\n  \"food_preference\": \"Vegetarian\",\n  \"luxury_level\": \"Moderate\",\n  \"adventure_level\": \"High\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/planner/start",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "planner", "start"]
+						}
+					}
+				},
+				{
+					"name": "Planner Chat Stream",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"message\": \"Can you add scuba diving to Day 2 afternoon?\",\n  \"trip_id\": \"sample-trip-id\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/planner/chat",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "planner", "chat"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Trips",
+			"item": [
+				{
+					"name": "Get User Trip History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/trip/history",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "trip", "history"]
+						}
+					}
+				},
+				{
+					"name": "Get Trip Details by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/trip/trip-12345",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "trip", "trip-12345"]
+						}
+					}
+				},
+				{
+					"name": "Delete Trip",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/trip/trip-12345",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "trip", "trip-12345"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000"
+		},
+		{
+			"key": "jwt_token",
+			"value": ""
+		}
+	]
+}

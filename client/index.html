@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TripGenie - Agentic AI Autonomous Travel Planner</title>
+    <meta name="description" content="Intelligent multi-agent autonomous travel planning platform powered by LangGraph, FastAPI, and React." />
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      window.addEventListener('error', function(e) {
+        var errDiv = document.getElementById('debug-error-banner');
+        if (!errDiv) {
+          errDiv = document.createElement('div');
+          errDiv.id = 'debug-error-banner';
+          errDiv.style.position = 'fixed';
+          errDiv.style.top = '0';
+          errDiv.style.left = '0';
+          errDiv.style.width = '100%';
+          errDiv.style.background = '#b91c1c';
+          errDiv.style.color = 'white';
+          errDiv.style.padding = '24px';
+          errDiv.style.zIndex = '999999';
+          errDiv.style.fontFamily = 'monospace';
+          errDiv.style.fontSize = '14px';
+          errDiv.style.whiteSpace = 'pre-wrap';
+          errDiv.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.5)';
+          document.body.appendChild(errDiv);
+        }
+        errDiv.innerHTML = '<h2 style="font-size:18px;font-weight:bold;margin-bottom:8px;">❌ CRITICAL RUNTIME ERROR:</h2>' + e.message + '\n\nStack Trace:\n' + (e.error ? e.error.stack : 'No stack');
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var errDiv = document.getElementById('debug-error-banner');
+        if (!errDiv) {
+          errDiv = document.createElement('div');
+          errDiv.id = 'debug-error-banner';
+          errDiv.style.position = 'fixed';
+          errDiv.style.top = '0';
+          errDiv.style.left = '0';
+          errDiv.style.width = '100%';
+          errDiv.style.background = '#b91c1c';
+          errDiv.style.color = 'white';
+          errDiv.style.padding = '24px';
+          errDiv.style.zIndex = '999999';
+          errDiv.style.fontFamily = 'monospace';
+          errDiv.style.fontSize = '14px';
+          errDiv.style.whiteSpace = 'pre-wrap';
+          errDiv.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.5)';
+          document.body.appendChild(errDiv);
+        }
+        errDiv.innerHTML = '<h2 style="font-size:18px;font-weight:bold;margin-bottom:8px;">⚠️ UNHANDLED REJECTION:</h2>' + e.reason + '\n\nStack:\n' + (e.reason && e.reason.stack ? e.reason.stack : 'No stack');
+      });
+    </script>
+  </head>
+  <body class="bg-slate-950 text-slate-100 antialiased font-sans selection:bg-emerald-500 selection:text-white min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
