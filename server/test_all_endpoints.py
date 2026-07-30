@@ -205,12 +205,63 @@ def run_all_tests():
     else:
         print(f"[FAIL] 16/{total} DELETE /api/v1/trip/{created_trip_id} -> FAILED (Status: {status}, Res: {res})")
 
+    # 17. POST /api/v1/booking/create (Create Booking)
+    created_booking_id = None
+    booking_payload = {
+        "trip_id": created_trip_id,
+        "destination": "Goa, India",
+        "duration_days": 4
+    }
+    status, res = make_request(f"{BASE_URL}/api/v1/booking/create", method="POST", data=booking_payload, headers=auth_headers)
+    if status == 200 and "booking_id" in res:
+        created_booking_id = res["booking_id"]
+        print(f"[OK] 17/21 POST /api/v1/booking/create -> PASSED (Booking created: {created_booking_id})")
+        passed += 1
+    else:
+        print(f"[FAIL] 17/21 POST /api/v1/booking/create -> FAILED (Status: {status}, Res: {res})")
+
+    if not created_booking_id:
+        created_booking_id = "BK-TEST1234"
+
+    # 18. GET /api/v1/booking/{booking_id}
+    status, res = make_request(f"{BASE_URL}/api/v1/booking/{created_booking_id}", method="GET")
+    if status == 200 and "booking_id" in res:
+        print(f"[OK] 18/21 GET /api/v1/booking/{created_booking_id} -> PASSED (Status: {res.get('status')})")
+        passed += 1
+    else:
+        print(f"[FAIL] 18/21 GET /api/v1/booking/{created_booking_id} -> FAILED (Status: {status})")
+
+    # 19. POST /api/v1/booking/{booking_id}/pay (Simulate Payment)
+    status, res = make_request(f"{BASE_URL}/api/v1/booking/{created_booking_id}/pay", method="POST", data={"payment_method": "UPI"})
+    if status == 200 and res.get("status") == "Paid":
+        print(f"[OK] 19/21 POST /api/v1/booking/{created_booking_id}/pay -> PASSED (Paid ID: {res.get('payment_id')})")
+        passed += 1
+    else:
+        print(f"[FAIL] 19/21 POST /api/v1/booking/{created_booking_id}/pay -> FAILED (Status: {status}, Res: {res})")
+
+    # 20. GET /api/v1/booking/{booking_id}/pdf/ticket (Download Ticket PDF)
+    status, res = make_request(f"{BASE_URL}/api/v1/booking/{created_booking_id}/pdf/ticket", method="GET")
+    if status == 200 and isinstance(res, bytes) and res.startswith(b"%PDF"):
+        print(f"[OK] 20/21 GET /api/v1/booking/{created_booking_id}/pdf/ticket -> PASSED (Ticket PDF generated: {len(res)} bytes)")
+        passed += 1
+    else:
+        print(f"[FAIL] 20/21 GET /api/v1/booking/{created_booking_id}/pdf/ticket -> FAILED (Status: {status})")
+
+    # 21. GET /api/v1/booking/{booking_id}/pdf/receipt (Download Receipt PDF)
+    status, res = make_request(f"{BASE_URL}/api/v1/booking/{created_booking_id}/pdf/receipt", method="GET")
+    if status == 200 and isinstance(res, bytes) and res.startswith(b"%PDF"):
+        print(f"[OK] 21/21 GET /api/v1/booking/{created_booking_id}/pdf/receipt -> PASSED (Receipt PDF generated: {len(res)} bytes)")
+        passed += 1
+    else:
+        print(f"[FAIL] 21/21 GET /api/v1/booking/{created_booking_id}/pdf/receipt -> FAILED (Status: {status})")
+
     print("=" * 65)
-    print(f"SUMMARY: {passed}/{total} API Endpoints Verified Successfully!")
+    print(f"SUMMARY: {passed}/21 API Endpoints Verified Successfully!")
     print("=" * 65)
     
-    return passed == total
+    return passed == 21
 
 if __name__ == "__main__":
     success = run_all_tests()
     sys.exit(0 if success else 1)
+

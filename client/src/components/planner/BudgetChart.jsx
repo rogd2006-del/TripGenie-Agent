@@ -5,12 +5,14 @@ export const BudgetChart = ({ budgetBreakdown, targetBudget = 20000 }) => {
   if (!budgetBreakdown) return null;
 
   const categories = [
-    { label: 'Accommodation', key: 'stay', color: 'bg-emerald-500', percent: 45 },
-    { label: 'Food & Dining', key: 'food', color: 'bg-teal-400', percent: 25 },
-    { label: 'Activities & Sports', key: 'activities', color: 'bg-cyan-400', percent: 15 },
-    { label: 'Transport & Commute', key: 'transport', color: 'bg-indigo-400', percent: 10 },
-    { label: 'Contingency Buffer', key: 'contingency', color: 'bg-purple-400', percent: 5 },
+    { label: 'Hotel Cost', key: 'hotel_cost', altKey: 'stay', color: 'bg-emerald-500', percent: 45 },
+    { label: 'Transport Cost', key: 'transport_cost', altKey: 'transport', color: 'bg-indigo-400', percent: 10 },
+    { label: 'Food Cost', key: 'food_cost', altKey: 'food', color: 'bg-teal-400', percent: 25 },
+    { label: 'Sightseeing Cost', key: 'sightseeing_cost', altKey: 'activities', color: 'bg-cyan-400', percent: 15 },
+    { label: 'Miscellaneous', key: 'miscellaneous', altKey: 'contingency', color: 'bg-purple-400', percent: 5 },
   ];
+
+  const grandTotal = budgetBreakdown.grand_total || budgetBreakdown.total || targetBudget;
 
   return (
     <div className="glass-panel rounded-3xl p-6 lg:p-8 border border-slate-800 shadow-2xl space-y-6">
@@ -26,9 +28,9 @@ export const BudgetChart = ({ budgetBreakdown, targetBudget = 20000 }) => {
         </div>
 
         <div className="text-right">
-          <span className="text-xs text-slate-400">Target Budget</span>
+          <span className="text-xs text-slate-400">Grand Total</span>
           <p className="text-lg font-extrabold text-emerald-400 flex items-center justify-end">
-            <IndianRupee className="w-4 h-4" /> {targetBudget.toLocaleString()}
+            <IndianRupee className="w-4 h-4" /> {grandTotal.toLocaleString('en-IN')}
           </p>
         </div>
       </div>
@@ -48,7 +50,7 @@ export const BudgetChart = ({ budgetBreakdown, targetBudget = 20000 }) => {
       {/* Categories Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {categories.map((cat) => {
-          const val = budgetBreakdown[cat.key] || 0;
+          const val = budgetBreakdown[cat.key] ?? budgetBreakdown[cat.altKey] ?? 0;
           return (
             <div key={cat.key} className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800/80 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -59,12 +61,13 @@ export const BudgetChart = ({ budgetBreakdown, targetBudget = 20000 }) => {
                 </div>
               </div>
               <span className="text-xs font-bold text-white font-mono flex items-center">
-                ₹{val.toLocaleString()}
+                ₹{val.toLocaleString('en-IN')}
               </span>
             </div>
           );
         })}
       </div>
+
 
       <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-950/40 p-3 rounded-xl border border-emerald-800/40">
         <ShieldCheck className="w-4 h-4 shrink-0" />

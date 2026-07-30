@@ -11,15 +11,25 @@ import { TransportCard } from '../components/planner/TransportCard';
 import { WeatherCard } from '../components/planner/WeatherCard';
 import { RestaurantCard } from '../components/planner/RestaurantCard';
 import { PackingList } from '../components/planner/PackingList';
+import { TransportOptionsCard } from '../components/planner/TransportOptionsCard';
+import { BookingModal } from '../components/planner/BookingModal';
+
 
 export const TripDetailsPage = () => {
   const { id } = useParams();
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [selectedTransport, setSelectedTransport] = useState(null);
 
   useEffect(() => {
     tripService.getTripById(id)
-      .then(data => setTrip(data))
+      .then(data => {
+        setTrip(data);
+        if (data?.hotels?.[0]) setSelectedHotel(data.hotels[0]);
+        if (data?.transport?.options?.[0]) setSelectedTransport(data.transport.options[0]);
+      })
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
   }, [id]);
@@ -64,13 +74,22 @@ export const TripDetailsPage = () => {
             <h1 className="text-2xl sm:text-4xl font-extrabold text-white">{trip.title}</h1>
           </div>
 
-          <a
-            href={tripService.getPdfDownloadUrl(id)}
-            download
-            className="px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-xl shadow-emerald-500/25 transition-all flex items-center gap-2 shrink-0"
-          >
-            <Download className="w-4 h-4" /> Download PDF Report
-          </a>
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setIsBookingOpen(true)}
+              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs shadow-xl shadow-emerald-500/25 transition-all"
+            >
+              Book Now
+            </button>
+
+            <a
+              href={tripService.getPdfDownloadUrl(id)}
+              download
+              className="px-5 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs shadow-xl transition-all flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" /> Download PDF Report
+            </a>
+          </div>
         </div>
       </div>
 
@@ -89,7 +108,7 @@ export const TripDetailsPage = () => {
       {/* Budget Chart */}
       <BudgetChart budgetBreakdown={trip.budget_breakdown} targetBudget={trip.budget} />
 
-      {/* Hotels & Transport */}
+      {/* Hotels & Weather Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
           <h3 className="text-sm font-bold text-white uppercase tracking-wider">Hotels</h3>
@@ -99,15 +118,40 @@ export const TripDetailsPage = () => {
             </div>
           ) : (
             trip.hotels.map((h, i) => (
-              <HotelCard key={i} hotel={h} />
+              <HotelCard 
+                key={i} 
+                hotel={h} 
+                isSelected={selectedHotel && (selectedHotel.name === h.name || selectedHotel.hotel_name === h.hotel_name)}
+                onSelect={setSelectedHotel}
+              />
             ))
           )}
         </div>
+
         <div className="space-y-6">
-          <TransportCard transport={trip.transport} />
           <WeatherCard weather={trip.weather} />
+          <TransportCard transport={trip.transport} />
         </div>
       </div>
+
+      {/* Transport Options Section (Below Hotels) */}
+      <TransportOptionsCard
+        transport={trip.transport}
+        selectedTransport={selectedTransport}
+        onSelectTransport={setSelectedTransport}
+        onBookNow={() => setIsBookingOpen(true)}
+      />
+
+      {/* Booking Modal */}
+      <BookingModal
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+        trip={trip}
+        selectedHotel={selectedHotel}
+        selectedTransport={selectedTransport}
+      />
+
+
 
       {/* Dining Spots */}
       <div className="space-y-4">

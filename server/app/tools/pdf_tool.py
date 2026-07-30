@@ -87,3 +87,167 @@ def generate_pdf_report(trip_data: Dict[str, Any]) -> bytes:
     doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
+
+
+def generate_transport_ticket_pdf(booking: Dict[str, Any]) -> bytes:
+    """Generate printable PDF Transport Ticket."""
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
+    story = []
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'TicketTitle',
+        parent=styles['Heading1'],
+        fontSize=20,
+        textColor=colors.HexColor('#0284c7'),
+        spaceAfter=6
+    )
+    heading_style = ParagraphStyle(
+        'TicketHeading',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor('#0f172a'),
+        spaceBefore=10,
+        spaceAfter=6
+    )
+    body_style = styles['Normal']
+
+    story.append(Paragraph("TripGenie Official Transport E-Ticket", title_style))
+    story.append(Paragraph(f"<b>Status:</b> {booking.get('status', 'Confirmed').upper()}", body_style))
+    story.append(Spacer(1, 10))
+
+    transport = booking.get("transport", {})
+    t_data = [
+        ["Field", "Details"],
+        ["Booking ID", booking.get("booking_id", "N/A")],
+        ["Transport Booking ID", booking.get("transport_booking_id", "N/A")],
+        ["Destination", booking.get("destination", "N/A")],
+        ["Transport Type", transport.get("transport_type", "Bus/Train/Flight")],
+        ["Operator Name", transport.get("operator_name", "Express Carrier")],
+        ["Vehicle / Flight No.", transport.get("vehicle_number", "N/A")],
+        ["Departure Time", transport.get("departure_time", "N/A")],
+        ["Arrival Time", transport.get("arrival_time", "N/A")],
+        ["Travel Duration", transport.get("travel_duration", "N/A")],
+        ["Available / Booked Seats", str(transport.get("available_seats", 1))],
+        ["Ticket Price", f"INR {booking.get('transport_cost', transport.get('price', 0)):,}"]
+    ]
+
+    t = Table(t_data, colWidths=[180, 280])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#e0f2fe')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#0369a1')),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+    ]))
+    story.append(t)
+    story.append(Spacer(1, 14))
+    story.append(Paragraph("<b>Note:</b> Please present this digital ticket during boarding along with a valid Government ID.", body_style))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+
+def generate_hotel_voucher_pdf(booking: Dict[str, Any]) -> bytes:
+    """Generate printable PDF Hotel Voucher."""
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
+    story = []
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'VoucherTitle',
+        parent=styles['Heading1'],
+        fontSize=20,
+        textColor=colors.HexColor('#059669'),
+        spaceAfter=6
+    )
+    body_style = styles['Normal']
+
+    story.append(Paragraph("TripGenie Official Hotel Voucher", title_style))
+    story.append(Paragraph(f"<b>Status:</b> {booking.get('status', 'Confirmed').upper()}", body_style))
+    story.append(Spacer(1, 10))
+
+    hotel = booking.get("hotel", {})
+    h_data = [
+        ["Field", "Details"],
+        ["Booking ID", booking.get("booking_id", "N/A")],
+        ["Hotel Booking ID", booking.get("hotel_booking_id", "N/A")],
+        ["Destination", booking.get("destination", "N/A")],
+        ["Hotel Name", hotel.get("name", "Luxury Resort & Spa")],
+        ["Address", hotel.get("address", "N/A")],
+        ["Rating", f"{hotel.get('rating', 4.5)} / 5.0"],
+        ["Amenities", ", ".join(hotel.get("amenities", ["WiFi", "Breakfast"]))],
+        ["Nightly Rate", f"INR {hotel.get('price_per_night', 0):,}"],
+        ["Total Accommodation Cost", f"INR {booking.get('hotel_cost', 0):,}"]
+    ]
+
+    t = Table(h_data, colWidths=[180, 280])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#dcfce7')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#15803d')),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+    ]))
+    story.append(t)
+    story.append(Spacer(1, 14))
+    story.append(Paragraph("<b>Check-in Policy:</b> Standard check-in is 12:00 PM. Present this voucher at front desk.", body_style))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+
+def generate_payment_receipt_pdf(booking: Dict[str, Any]) -> bytes:
+    """Generate printable PDF Payment Receipt."""
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
+    story = []
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'ReceiptTitle',
+        parent=styles['Heading1'],
+        fontSize=20,
+        textColor=colors.HexColor('#7c3aed'),
+        spaceAfter=6
+    )
+    body_style = styles['Normal']
+
+    story.append(Paragraph("TripGenie Official Payment Invoice & Receipt", title_style))
+    story.append(Paragraph(f"<b>Payment Status:</b> {booking.get('status', 'Paid').upper()}", body_style))
+    story.append(Spacer(1, 10))
+
+    r_data = [
+        ["Description", "Amount (INR)"],
+        ["Booking Reference ID", booking.get("booking_id", "N/A")],
+        ["Payment Reference ID", booking.get("payment_id", "PAY-SIMULATED")],
+        ["Payment Date", booking.get("payment_date", booking.get("booking_date", "N/A"))],
+        ["Hotel Accommodation Cost", f"{booking.get('hotel_cost', 0):,}"],
+        ["Transport Commute Cost", f"{booking.get('transport_cost', 0):,}"],
+        ["Service Charge", f"{booking.get('service_charge', 250):,}"],
+        ["GST (18%)", f"{booking.get('gst', 0):,}"],
+        ["Grand Total Paid", f"{booking.get('grand_total', 0):,}"]
+    ]
+
+    t = Table(r_data, colWidths=[240, 220])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#f3e8ff')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#6d28d9')),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ('FONTNAME', (0,-1), (-1,-1), 'Helvetica-Bold'),
+        ('BACKGROUND', (0,-1), (-1,-1), colors.HexColor('#ddd6fe')),
+    ]))
+    story.append(t)
+    story.append(Spacer(1, 14))
+    story.append(Paragraph("<b>Thank you for booking with TripGenie Autonomous AI Planner!</b>", body_style))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
+

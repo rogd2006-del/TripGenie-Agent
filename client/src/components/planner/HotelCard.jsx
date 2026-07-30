@@ -1,11 +1,11 @@
 import React from 'react';
 import { Star, MapPin, Check, Hotel, Navigation, Globe, Phone, ExternalLink } from 'lucide-react';
 
-export const HotelCard = ({ hotel }) => {
+export const HotelCard = ({ hotel, isSelected = false, onSelect = null }) => {
   if (!hotel) return null;
 
   const hotelName = hotel.hotel_name || hotel.name || 'Boutique Hotel';
-  const priceDisplay = typeof hotel.price === 'number' ? `₹${hotel.price.toLocaleString()}` : (hotel.price || 'Contact for price');
+  const priceDisplay = typeof hotel.price === 'number' ? `₹${hotel.price.toLocaleString()}` : (hotel.price ? `₹${hotel.price}` : 'Contact for price');
   const ratingDisplay = hotel.rating || '4.5';
   const reviewsDisplay = hotel.reviews ? `(${hotel.reviews} reviews)` : '';
   const mapsUrl = hotel.maps_url || (hotel.latitude && hotel.longitude 
@@ -13,7 +13,21 @@ export const HotelCard = ({ hotel }) => {
     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelName + ' ' + hotel.address)}`);
 
   return (
-    <div className="glass-card rounded-2xl overflow-hidden border border-slate-800 hover:border-emerald-500/40 transition-all flex flex-col md:flex-row shadow-xl">
+    <div 
+      onClick={onSelect ? () => onSelect(hotel) : undefined}
+      className={`glass-card rounded-2xl overflow-hidden border transition-all flex flex-col md:flex-row shadow-xl relative ${
+        isSelected 
+          ? 'border-emerald-500 ring-2 ring-emerald-500/50 bg-emerald-950/20' 
+          : 'border-slate-800 hover:border-emerald-500/40 cursor-pointer'
+      }`}
+    >
+      {/* Selection Check Badge */}
+      {isSelected && (
+        <div className="absolute top-3 right-3 z-10 bg-emerald-500 text-slate-950 px-3 py-1 rounded-full text-xs font-black flex items-center gap-1 shadow-lg">
+          <Check className="w-4 h-4 stroke-[3]" /> Selected Lodging
+        </div>
+      )}
+
       {/* Image Container */}
       <div className="md:w-2/5 h-52 md:h-auto relative overflow-hidden shrink-0">
         <img
@@ -77,15 +91,33 @@ export const HotelCard = ({ hotel }) => {
           </div>
         )}
 
-        {/* Action Buttons: View on Google Maps & Website */}
+        {/* Action Buttons: Select & View on Google Maps */}
         <div className="flex items-center gap-2 pt-3 border-t border-slate-800/80">
+          {onSelect && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect(hotel);
+              }}
+              className={`py-2 px-4 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 ${
+                isSelected 
+                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20' 
+                  : 'bg-slate-800 hover:bg-slate-700 text-white'
+              }`}
+            >
+              <Check className="w-4 h-4" /> {isSelected ? 'Selected' : 'Select Hotel'}
+            </button>
+          )}
+
           <a
             href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
           >
-            <Navigation className="w-3.5 h-3.5" /> View on Google Maps
+            <Navigation className="w-3.5 h-3.5" /> View Map
           </a>
 
           {hotel.website && (
@@ -93,6 +125,7 @@ export const HotelCard = ({ hotel }) => {
               href={hotel.website}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
               className="py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
             >
               <Globe className="w-3.5 h-3.5 text-cyan-400" /> Website <ExternalLink className="w-3 h-3 text-slate-500" />
@@ -104,3 +137,4 @@ export const HotelCard = ({ hotel }) => {
     </div>
   );
 };
+

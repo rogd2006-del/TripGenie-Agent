@@ -1,73 +1,79 @@
+import random
 from typing import List, Dict, Any
 
+HOTEL_PREFIXES = ["The Grand", "Royal", "Heritage", "Sands", "Skyline", "Ocean View", "Boutique", "Palace & Spa", "Golden Oasis", "Paradise", "Serenity", "La Residency"]
+HOTEL_SUFFIXES = ["Resort & Spa", "Suites", "Palace", "Boutique Stay", "Inn & Suites", "Grand Hotel", "Beach Villa", "Heights", "Retreat", "Lodge"]
+
+ALL_AMENITIES = [
+    "Free High-Speed WiFi", "Infinity Swimming Pool", "Rooftop Restaurant & Bar", 
+    "Complimentary Breakfast", "Full-service Spa & Wellness", "24/7 Room Service", 
+    "Airport Shuttle Service", "Fitness Center & Gym", "Panoramic City/Ocean View", 
+    "Air Conditioned Rooms", "Valet Parking", "Concierge Service"
+]
+
+HOTEL_IMAGES = [
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80"
+]
+
 def search_hotels(destination: str, luxury_level: str = "Moderate", budget: float = 20000) -> List[Dict[str, Any]]:
-    """Search lodging options tailored to target destination, luxury level, and budget."""
+    """Generate realistic, randomized fake hotels tailored to the target destination."""
     clean_dest = destination.split(",")[0].strip() if destination else "Destination"
     
-    # If budget is low (e.g. <= 5000 or 3000), default luxury level to budget
-    if budget <= 5000 or luxury_level.lower() == "budget":
-        return [
-            {
-                "name": f"The Backpackers Sanctuary {clean_dest}",
-                "rating": 4.4,
-                "price_per_night": min(1200, max(800, int(budget * 0.4))),
-                "amenities": ["Free WiFi", "Social Lounge", "Lockers", "Coffee Bar"],
-                "address": f"Central Heritage Street, {destination}",
-                "image": "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                "name": f"{clean_dest} Cliffside Budget Homestay",
-                "rating": 4.5,
-                "price_per_night": min(2200, max(1500, int(budget * 0.7))),
-                "amenities": ["Free WiFi", "Kitchenette", "Garden Terrace", "Breakfast"],
-                "address": f"Cliff Promenade, {destination}",
-                "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                "name": f"{clean_dest} Beach Breeze Inn",
-                "rating": 4.3,
-                "price_per_night": min(2800, max(1800, int(budget * 0.85))),
-                "amenities": ["Sea View", "Free WiFi", "AC Rooms", "24/7 Desk"],
-                "address": f"Papanasam Beach Road, {destination}",
-                "image": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=500&q=80"
-            }
-        ]
-    elif luxury_level.lower() == "luxury":
-        return [
-            {
-                "name": f"The Royal Grand Palace & Spa {clean_dest}",
-                "rating": 4.9,
-                "price_per_night": max(4500, int(budget * 0.35)),
-                "amenities": ["Infinity Pool", "Panoramic Spa & Wellness", "Fine Dining", "Concierge"],
-                "address": f"Prime Avenue, {destination}",
-                "image": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                "name": f"Heritage Grand Hotel {clean_dest}",
-                "rating": 4.8,
-                "price_per_night": max(3800, int(budget * 0.28)),
-                "amenities": ["Rooftop Lounge", "Valet Parking", "Butler Service", "Gourmet Breakfast"],
-                "address": f"Downtown Boulevard, {destination}",
-                "image": "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=500&q=80"
-            }
-        ]
-    else:  # Moderate
-        return [
-            {
-                "name": f"{clean_dest} Residency & Suites",
-                "rating": 4.6,
-                "price_per_night": max(2200, int(budget * 0.18)),
-                "amenities": ["Swimming Pool", "Free Hot Breakfast", "Scenic Views", "High-speed WiFi"],
-                "address": f"Main Boulevard, {destination}",
-                "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                "name": f"Green Promenade Hotel {clean_dest}",
-                "rating": 4.5,
-                "price_per_night": max(1800, int(budget * 0.15)),
-                "amenities": ["Balcony Views", "Breakfast Included", "24/7 Front Desk"],
-                "address": f"Park Road, {destination}",
-                "image": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=500&q=80"
-            }
-        ]
+    # Use destination + luxury level hash to seed random for reproducible yet distinct per destination results
+    seed_val = hash(f"{clean_dest.lower()}_{luxury_level.lower()}") % (2**32)
+    rng = random.Random(seed_val)
 
+    lux = luxury_level.lower()
+    if budget <= 5000 or lux == "budget":
+        base_price = min(1800, max(900, int(budget * 0.25)))
+        tier_label = "Budget"
+    elif lux == "luxury" or budget >= 35000:
+        base_price = max(4200, int(budget * 0.30))
+        tier_label = "Luxury"
+    else:
+        base_price = max(2200, int(budget * 0.20))
+        tier_label = "Moderate"
+
+    hotels = []
+    prefixes = rng.sample(HOTEL_PREFIXES, 3)
+    suffixes = rng.sample(HOTEL_SUFFIXES, 3)
+
+    for i in range(3):
+        pfx = prefixes[i]
+        sfx = suffixes[i]
+        hotel_name = f"{pfx} {clean_dest} {sfx}"
+        
+        # Price variation: +/- 20%
+        price_variation = rng.randint(-15, 25)
+        price_per_night = max(800, int(base_price * (1 + price_variation / 100.0)))
+        
+        rating = round(rng.uniform(4.2, 4.9), 1)
+        reviews_cnt = rng.randint(120, 950)
+        
+        # Select 4 random amenities
+        amenities = rng.sample(ALL_AMENITIES, 4)
+        
+        img = HOTEL_IMAGES[i % len(HOTEL_IMAGES)]
+        address = f"No. {rng.randint(12, 180)}, Main Boulevard, {clean_dest}, India"
+        
+        hotels.append({
+            "hotel_id": f"HTL-{clean_dest[:3].upper()}-{rng.randint(100, 999)}",
+            "name": hotel_name,
+            "hotel_name": hotel_name,
+            "rating": str(rating),
+            "reviews": str(reviews_cnt),
+            "price_per_night": price_per_night,
+            "price": price_per_night,
+            "amenities": amenities,
+            "address": address,
+            "image": img,
+            "tier": tier_label,
+            "maps_url": f"https://www.google.com/maps/search/?api=1&query={hotel_name.replace(' ', '+')}"
+        })
+
+    return hotels

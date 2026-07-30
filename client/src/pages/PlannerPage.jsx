@@ -13,6 +13,10 @@ import { TransportCard } from '../components/planner/TransportCard';
 import { WeatherCard } from '../components/planner/WeatherCard';
 import { RestaurantCard } from '../components/planner/RestaurantCard';
 import { PackingList } from '../components/planner/PackingList';
+import { TransportOptionsCard } from '../components/planner/TransportOptionsCard';
+import { BookingModal } from '../components/planner/BookingModal';
+
+
 
 export const PlannerPage = () => {
   const [logs, setLogs] = useState([]);
@@ -20,6 +24,11 @@ export const PlannerPage = () => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [generatedTrip, setGeneratedTrip] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  
+  // Selection states for hotel & transport
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [selectedTransport, setSelectedTransport] = useState(null);
 
   const navigate = useNavigate();
 
@@ -29,6 +38,8 @@ export const PlannerPage = () => {
     setLogs([]);
     setGeneratedTrip(null);
     setErrorMessage(null);
+    setSelectedHotel(null);
+    setSelectedTransport(null);
 
     try {
       const res = await plannerService.startPlannerStream(
@@ -41,6 +52,8 @@ export const PlannerPage = () => {
           }
           if (event.status === 'completed' && event.trip_data) {
             setGeneratedTrip(event.trip_data);
+            if (event.trip_data.hotels?.[0]) setSelectedHotel(event.trip_data.hotels[0]);
+            if (event.trip_data.transport?.options?.[0]) setSelectedTransport(event.trip_data.transport.options[0]);
             setIsCompleted(true);
             setIsPlanning(false);
           }
@@ -61,6 +74,7 @@ export const PlannerPage = () => {
       setErrorMessage('Backend server is offline.');
     }
   };
+
 
   const handleSaveTrip = async () => {
     if (!generatedTrip) return;
@@ -127,6 +141,13 @@ export const PlannerPage = () => {
 
             <div className="flex items-center gap-3 shrink-0">
               <button
+                onClick={() => setIsBookingOpen(true)}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/25 transition-all"
+              >
+                Book Now
+              </button>
+
+              <button
                 onClick={handleSaveTrip}
                 className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-200 hover:text-emerald-400 transition-all flex items-center gap-1.5"
               >
@@ -136,7 +157,7 @@ export const PlannerPage = () => {
               <a
                 href={tripService.getPdfDownloadUrl(generatedTrip.id || generatedTrip._id)}
                 download
-                className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
               >
                 <Download className="w-4 h-4" /> Export PDF Report
               </a>
@@ -152,7 +173,7 @@ export const PlannerPage = () => {
           {/* Budget Allocation */}
           <BudgetChart budgetBreakdown={generatedTrip.budget_breakdown} targetBudget={generatedTrip.budget} />
 
-          {/* Hotels & Transport Grid */}
+          {/* Hotels & Weather Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider">Lodging Recommendations</h3>
@@ -162,16 +183,40 @@ export const PlannerPage = () => {
                 </div>
               ) : (
                 generatedTrip.hotels.map((h, i) => (
-                  <HotelCard key={i} hotel={h} />
+                  <HotelCard 
+                    key={i} 
+                    hotel={h} 
+                    isSelected={selectedHotel && (selectedHotel.name === h.name || selectedHotel.hotel_name === h.hotel_name)}
+                    onSelect={setSelectedHotel}
+                  />
                 ))
               )}
             </div>
 
             <div className="space-y-6">
-              <TransportCard transport={generatedTrip.transport} />
               <WeatherCard weather={generatedTrip.weather} />
+              <TransportCard transport={generatedTrip.transport} />
             </div>
           </div>
+
+          {/* Transport Options Section (Below Hotels) */}
+          <TransportOptionsCard
+            transport={generatedTrip.transport}
+            selectedTransport={selectedTransport}
+            onSelectTransport={setSelectedTransport}
+            onBookNow={() => setIsBookingOpen(true)}
+          />
+
+          {/* Booking Modal */}
+          <BookingModal
+            isOpen={isBookingOpen}
+            onClose={() => setIsBookingOpen(false)}
+            trip={generatedTrip}
+            selectedHotel={selectedHotel}
+            selectedTransport={selectedTransport}
+          />
+
+
 
           {/* Dining Spots */}
           <div className="space-y-4">

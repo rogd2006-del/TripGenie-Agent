@@ -13,7 +13,7 @@ from app.config.settings import settings, validate_openai_key
 from app.database.connection import db_manager
 from app.database.seed import seed_data
 from app.utils.logger import logger
-from app.api import auth, users, trips, planner
+from app.api import auth, users, trips, planner, booking
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -62,6 +62,7 @@ app.include_router(auth.router, prefix=settings.API_V1_STR)
 app.include_router(users.router, prefix=settings.API_V1_STR)
 app.include_router(trips.router, prefix=settings.API_V1_STR)
 app.include_router(planner.router, prefix=settings.API_V1_STR)
+app.include_router(booking.router)
 
 @app.get("/")
 async def root():
