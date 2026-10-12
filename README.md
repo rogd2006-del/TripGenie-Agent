@@ -1,4 +1,132 @@
-# 🧞‍♂️ TripGenie: An Agentic AI-Based Autonomous Travel Planner
+# 🧞‍♂️ TripGenie: An Agentic AI‑Based Autonomous Travel Planner
+
+<div align="center">
+  
+  [![Architecture](https://img.shields.io/badge/Architecture-LangGraph%20Multi--Agent-emerald?style=for-the-badge&logo=langchain)](https://github.com/langchain-ai/langgraph)
+  [![Backend](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+  [![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
+  [![Database](https://img.shields.io/badge/Database-MongoDB-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
+  [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
+  [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+
+</div>
+
+---
+
+> **🚀 TripGenie** – A fully autonomous, goal‑directed, multi‑agent travel planner. Powered by **LangGraph**, **FastAPI**, **React + Vite**, and **MongoDB**. Generate budget‑verified itineraries, watch agents think in real‑time, and receive PDF booking vouchers instantly.
+
+## ✨ Highlights
+
+- **🧠 8 Core AI Agents** collaborating via LangGraph
+- **💰 Budget Guardrails** – automatic cost‑capping for hotels & transport
+- **📍 Live Mapping** – interactive maps with route pins
+- **📄 PDF Vouchers** – instant downloadable booking passes
+- **⚡ SSE Streaming** – watch agents reason and act live
+- **🛡️ Safety & Compliance** – alerts, emergency contacts, and more
+
+## 📚 Table of Contents
+
+- [Architecture](#architecture)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Docker Deployment](#docker-deployment)
+- [Repository Structure](#repository-structure)
+- [Contributing](#contributing)
+- [License](#license)
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TD
+    User([👤 User Goal Input]) -->|Prompt / Form| Sup[👑 Supervisor Agent]
+    subgraph Swarm ["🤖 Autonomous Multi‑Agent Swarm (LangGraph)"]
+        Sup -->|Delegate Location| Dest[📍 Destination Agent]
+        Sup -->|Delegate Weather| Weat[🌤️ Weather Agent]
+        Sup -->|Delegate Pacing| Itin[📅 Itinerary Agent]
+        Sup -->|Delegate Stay| Hot[🏨 Hotel Agent]
+        Sup -->|Delegate Transit| Trans[🚗 Transport Agent]
+        Sup -->|Audit Budget| Budg[💰 Budget Agent]
+        Sup -->|Check Safety| Safe[🛡️ Safety Agent]
+        Dest -->|Geocoding Tool| Tools[🛠️ External Tools]
+        Weat -->|Weather Tool| Tools
+        Hot -->|Hotel Search Tool| Tools
+        Trans -->|Route Fare Tool| Tools
+        Budg -->|Budget Guardrail Tool| Tools
+    end
+    Budg -->|Re‑Select if Exceeded| Hot
+    Swarm -->|Real‑Time SSE Stream| UI[💻 React Dashboard]
+    Swarm -->|Generate Vouchers| PDF[📄 PDF Engine]
+    style Sup fill:#4F46E5,color:#fff,stroke:#312E81
+    style Swarm fill:#0F172A,color:#fff,stroke:#38BDF8
+    style Tools fill:#059669,color:#fff,stroke:#047857
+    style UI fill:#9333EA,color:#fff,stroke:#6B21A8
+```
+
+## 🚀 Features
+
+| Feature | Description |
+|:---|:---|
+| **Real‑Time Agent Stream** | Watch agents reason, invoke tools, and update state via Server‑Sent Events |
+| **Budget Enforcement** | Automatic re‑selection of hotels & transport if cost exceeds user‑set limits |
+| **PDF Vouchers** | Generate printable, barcode‑enabled travel documents |
+| **Interactive Maps** | Visualize daily routes, attractions, and accommodation locations |
+| **Multi‑LLM Support** | OpenAI GPT‑4o, Ollama Llama 3, and a heuristic fallback for offline usage |
+| **Extensible Agent Plugins** | Add new domain agents (e.g., attractions, restaurants) with ease |
+
+## ⚡ Quick Start Guide
+
+### Backend
+```bash
+cd server
+python -m venv venv
+# Windows PowerShell
+.\\venv\\Scripts\\activate
+# Install dependencies
+pip install -r requirements.txt
+# Launch FastAPI
+python main.py```
+Visit `http://localhost:8000/docs` for the OpenAPI UI.
+
+### Frontend
+```bash
+cd client
+npm install
+npm run dev```
+Open `http://localhost:5173` in your browser.
+
+## 🐳 Docker Deployment
+```bash
+docker-compose up --build```
+
+| Service | URL | Port |
+|:---|:---|---:|
+| **Frontend UI** | `http://localhost:3000` | 3000 |
+| **FastAPI Backend** | `http://localhost:8000` | 8000 |
+| **MongoDB** | `mongodb://localhost:27017` | 27017 |
+
+## 📁 Repository Layout
+
+```
+TripGenie/
+├── client/                     # React 18 + Vite Frontend
+│   └── src/…
+├── server/                     # FastAPI + LangGraph Backend
+│   └── app/…
+├── docker-compose.yml
+└── README.md
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Fork the repo, create a feature branch, and submit a pull request. Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## 📄 License
+
+MIT License – see the [LICENSE](LICENSE) file for details.
+
+---
+
+*Made with ❤️ by the TripGenie team.*
 
 <div align="center">
 
